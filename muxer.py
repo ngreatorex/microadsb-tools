@@ -15,6 +15,8 @@ class Muxer:
         self.serial = SerialWrapper(self.serial_port)
 
     def run(self):
+        self.serial.write('#43-52\r')
+
         while self.sock.is_open() and self.serial.is_open():
             input_queue, output_queue = self.sock.run_once()
             
