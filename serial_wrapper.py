@@ -7,7 +7,7 @@ class SerialWrapper:
         self.port = port
         self.logger = logging.getLogger(__name__)
 
-        self.ser = serial.Serial(self.port, 115200, timeout=0.1)
+        self.ser = serial.Serial(self.port, 115200, timeout=0.05)
 
 
     def clear_buffer(self):
