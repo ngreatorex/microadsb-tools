@@ -4,6 +4,7 @@ from socket_wrapper import SocketWrapper
 from serial_wrapper import SerialWrapper
 import queue
 import logging
+import sys
 
 class Muxer:
     def __init__(self, tcp_port=54321, serial_port='/dev/ttyACM0'):
@@ -26,16 +27,20 @@ class Muxer:
                 except queue.Empty:
                     break
                 else:
-                    self.logger.info("Received message [%s] from network client", next_msg)
+                    self.logger.debug("Received message [%s] from network client", next_msg)
                     self.serial.write_bytes(next_msg)
 
             message = self.serial.read_line()
             if len(message) > 0:
-                self.logger.info("Received message [%s] from serial port", message)
+                self.logger.debug("Received message [%s] from serial port", message)
                 output_queue.put(message)
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    stdout = logging.StreamHandler(stream=sys.stdout)
+    stdout.setLevel(logging.DEBUG)
+    stderr = logging.StreamHandler(stream=sys.stderr)
+    stderr.setLevel(logging.INFO)
+    logging.basicConfig(handlers=[stdout, stderr], level=logging.DEBUG)
 
     m = Muxer()
 
