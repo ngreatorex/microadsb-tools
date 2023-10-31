@@ -62,26 +62,26 @@ class SocketWrapper:
                 else:
                     try:
                         data = s.recv(1024)
+
+                        if data:
+                            self.logger.info("Received message [%s] from [%s]", data, s.getpeername())
+                            self.input_queue.put(data)
+                            #self.message_output_queues[s].put(data)
+                            #if s not in self.outputs:
+                            #    self.outputs.append(s)
+                        else:
+                            if s in self.outputs:
+                                self.outputs.remove(s)
+                            if s in writable:
+                                writable.remove(s)
+                            self.inputs.remove(s)
+                            self.clients.remove(s)
+                            self.logger.info("Removed connection [%s]", s)
+                            s.close()
+                            del self.message_output_queues[s]
                     except:
                         pass
 
-                    if data:
-                        self.logger.info("Received message [%s] from [%s]", data, s.getpeername())
-                        self.input_queue.put(data)
-                        #self.message_output_queues[s].put(data)
-                        #if s not in self.outputs:
-                        #    self.outputs.append(s)
-                    else:
-                        if s in self.outputs:
-                            self.outputs.remove(s)
-                        if s in writable:
-                            writable.remove(s)
-                        self.inputs.remove(s)
-                        self.clients.remove(s)
-                        self.logger.info("Removed connection [%s]", s)
-                        s.close()
-                        del self.message_output_queues[s]
-        
             for s in writable:
                 try:
                     next_msg = self.message_output_queues[s].get_nowait()
